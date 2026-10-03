@@ -28,6 +28,7 @@ const MigrateInstanceBulkModal: FC<Props> = ({
   const isClustered = useIsClustered();
   const [type, setType] = useState<BulkMigrationType>("");
   const [target, setTarget] = useState("");
+  const [nearLive, setNearLive] = useState(true);
   const { handleMigrate, getMigratableInstances } = useInstanceBulkMigration({
     instances,
     type,
@@ -133,8 +134,10 @@ const MigrateInstanceBulkModal: FC<Props> = ({
           getMigratableInstances={getMigratableInstances}
           onCancel={handleGoBack}
           migrate={() => {
-            handleMigrate(target, "", "");
+            handleMigrate(target, "", "", nearLive);
           }}
+          nearLive={nearLive}
+          onNearLiveChange={setNearLive}
         />
       )}
 

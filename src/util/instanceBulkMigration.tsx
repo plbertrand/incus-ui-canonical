@@ -74,6 +74,7 @@ export const useInstanceBulkMigration = ({
     targetMember: string,
     targetPool: string,
     targetProject: string,
+    nearLive = true,
   ) => {
     const migratableInstances = getMigratableInstances(
       targetMember,
@@ -98,7 +99,7 @@ export const useInstanceBulkMigration = ({
       targetPool,
       targetProject,
       eventQueue,
-      hasInstanceRefreshMigration,
+      hasInstanceRefreshMigration && nearLive,
     )
       .then((results) => {
         const { fulfilledCount, rejectedCount } =

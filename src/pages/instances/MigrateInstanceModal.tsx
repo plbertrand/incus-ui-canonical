@@ -21,6 +21,7 @@ const MigrateInstanceModal: FC<Props> = ({ close, instance }) => {
   const isClustered = useIsClustered();
   const [type, setType] = useState<MigrationType>("");
   const [target, setTarget] = useState("");
+  const [nearLive, setNearLive] = useState(true);
   const { handleMigrate } = useInstanceMigration({
     close,
     instance,
@@ -132,7 +133,11 @@ const MigrateInstanceModal: FC<Props> = ({ close, instance }) => {
           onSelect={setTarget}
           targetMember={target}
           onCancel={handleGoBack}
-          migrate={() => handleMigrate(target, "", "")}
+          migrate={() => {
+            handleMigrate(target, "", "", nearLive);
+          }}
+          nearLive={nearLive}
+          onNearLiveChange={setNearLive}
         />
       )}
 

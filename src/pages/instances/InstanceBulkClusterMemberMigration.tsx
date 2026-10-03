@@ -1,8 +1,14 @@
 import type { FC } from "react";
-import { ActionButton, Button } from "@canonical/react-components";
+import {
+  ActionButton,
+  Button,
+  CheckboxInput,
+} from "@canonical/react-components";
 import type { LxdInstance } from "types/instance";
 import ClusterMemberSelectTable from "../cluster/ClusterMemberSelectTable";
 import { pluralize } from "util/helpers";
+import { useSupportedFeatures } from "context/useSupportedFeatures";
+import { isNearLiveMigration } from "util/nearLiveMigration";
 
 interface Props {
   instances: LxdInstance[];
@@ -15,6 +21,8 @@ interface Props {
   ) => LxdInstance[];
   onCancel: () => void;
   migrate: () => void;
+  nearLive: boolean;
+  onNearLiveChange: (nearLive: boolean) => void;
 }
 
 const InstanceBulkClusterMemberMigration: FC<Props> = ({
@@ -24,9 +32,16 @@ const InstanceBulkClusterMemberMigration: FC<Props> = ({
   getMigratableInstances,
   onCancel,
   migrate,
+  nearLive,
+  onNearLiveChange,
 }) => {
-  const migratableCount = getMigratableInstances(targetMember, "", "").length;
+  const { hasInstanceRefreshMigration } = useSupportedFeatures();
+  const migratableInstances = getMigratableInstances(targetMember, "", "");
+  const migratableCount = migratableInstances.length;
   const skippedCount = instances.length - migratableCount;
+  const canNearLive = migratableInstances.some((instance) =>
+    isNearLiveMigration(instance, hasInstanceRefreshMigration, targetMember),
+  );
 
   const summary = (
     <div className="migrate-instance-summary">
@@ -43,6 +58,16 @@ const InstanceBulkClusterMemberMigration: FC<Props> = ({
           </>
         )}
       </p>
+      {canNearLive && (
+        <CheckboxInput
+          id="near-live-migration"
+          label="Use near-live migration for running containers (stop, move and restart them)"
+          checked={nearLive}
+          onChange={() => {
+            onNearLiveChange(!nearLive);
+          }}
+        />
+      )}
     </div>
   );
 
